@@ -1,0 +1,8 @@
+streamlit
+google-generativeai
+pymupdf
+sentence-transformers
+chromadb
+python-dotenv
+torchvision
+nest-asyncio
