@@ -25,7 +25,7 @@ st.markdown(
 # Initialize session state variables
 init_session_state()
 
-# CSS Variables and Custom Styling (Light Mode only)
+# CSS Variables and Custom Styling 
 theme_css = """
 :root {
     --bg-color: #f8fafc;
@@ -301,8 +301,9 @@ st.markdown(f"""
     }}
     
     /* Align right-column navigation buttons to the right */
-    div[data-testid="column"]:nth-child(2) button {{
+    div[data-testid="column"]:nth-of-type(2) button {{
         float: right !important;
+        width: auto !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -319,7 +320,7 @@ with st.sidebar:
         col_v1, col_v2 = st.columns(2)
         with col_v1:
             btn_type = "primary" if st.session_state.view_mode == "learning_plan" else "secondary"
-            if st.button("Learning Plan", key="switch_learning_plan", type=btn_type, use_container_width=True):
+            if st.button("Learn", key="switch_learning_plan", type=btn_type, use_container_width=True):
                 if not st.session_state.topics:
                     with st.spinner("Analyzing curriculum and extracting topics..."):
                         topics = extract_topics(st.session_state.pdf_raw_text, st.session_state.study_mode)
@@ -328,10 +329,10 @@ with st.sidebar:
                 st.rerun()
         with col_v2:
             btn_type = "primary" if st.session_state.view_mode == "recall_sheet" else "secondary"
-            if st.button("Recall Sheet", key="switch_recall_sheet", type=btn_type, use_container_width=True):
+            if st.button("Exam Recall", key="switch_recall_sheet", type=btn_type, use_container_width=True):
                 if not st.session_state.recall_sheet:
                     from services.recall_sheet_generator import generate_recall_sheet
-                    with st.spinner("Generating Recall Sheet..."):
+                    with st.spinner("Generating Exam Recall Sheet..."):
                         st.session_state.recall_sheet = generate_recall_sheet(st.session_state.pdf_raw_text)
                 st.session_state.view_mode = "recall_sheet"
                 st.rerun()
@@ -388,9 +389,16 @@ with st.sidebar:
 
     # 2.2 Study Mode selection
     st.markdown('<h5>Study Mode</h5>', unsafe_allow_html=True)
+    study_modes = ["Exam Preparation", "Learn Concepts", "Quick Revision"]
+    try:
+        default_index = study_modes.index(st.session_state.study_mode)
+    except ValueError:
+        default_index = 1  # Fallback default
+        
     selected_mode = st.selectbox(
         "Choose Study Mode",
-        ["Exam Preparation", "Learn Concepts", "Quick Revision"],
+        study_modes,
+        index=default_index,
         label_visibility="collapsed",
         help="Tailors explanation density, priorities, and details."
     )
@@ -427,7 +435,7 @@ with st.sidebar:
         file_id = f"{uploaded_file.name}_{uploaded_file.size}"
         if st.session_state.pdf_metadata.get("file_id") != file_id:
             if not api_configured:
-                st.error("Please set GEMINI_API_KEY in your .env file before processing.")
+                st.error("Please set API key before processing.")
             else:
                 with st.spinner("Processing PDF and indexing notes..."):
                     try:
@@ -491,7 +499,7 @@ if st.session_state.view_mode == "landing":
     else:
         # PDF is uploaded, but no plan or recall sheet is generated yet (Landing with PDF metadata)
         st.markdown('<h1 class="main-header"><i class="fa-solid fa-graduation-cap" style="color: var(--primary-color); margin-right: 12px;"></i>StudyFlow AI</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="sub-header">Your notes have been successfully processed and indexed. Choose how you would like to proceed with your study session below.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Your notes have been successfully processed. Choose how you would like to proceed with your study session below.</p>', unsafe_allow_html=True)
         
         # Display uploaded file details
         meta = st.session_state.pdf_metadata
@@ -512,8 +520,8 @@ if st.session_state.view_mode == "landing":
         with col_plan:
             with st.container(border=True):
                 st.markdown('<h3 style="margin-top:0;"><i class="fa-solid fa-route" style="margin-right: 10px; color: var(--primary-color);"></i>Guided Learning Plan</h3>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size: 0.95rem; color: var(--text-secondary); min-height: 100px; line-height: 1.6;">Extracts a structured, sequential study curriculum from your notes. Focus on mastering concepts topic-by-topic with detailed explanations, interactive tutor doubt-solving chat, and customized diagnostics quizzes.</p>', unsafe_allow_html=True)
-                if st.button("🚀 Generate Guided Learning Plan", key="landing_generate_lp", type="primary", use_container_width=True):
+                st.markdown('<p style="font-size: 0.95rem; color: var(--text-secondary); min-height: 100px; line-height: 1.6;">Break your notes into topics, understand concepts,ask doubts, and test yourself with quizzes.</p>', unsafe_allow_html=True)
+                if st.button("Generate Guided Learning Plan", key="landing_generate_lp", type="primary", use_container_width=True):
                     with st.spinner("Analyzing curriculum and extracting topics..."):
                         topics = extract_topics(st.session_state.pdf_raw_text, st.session_state.study_mode)
                         st.session_state.topics = topics
@@ -522,9 +530,9 @@ if st.session_state.view_mode == "landing":
                     
         with col_recall:
             with st.container(border=True):
-                st.markdown('<h3 style="margin-top:0;"><i class="fa-solid fa-bolt" style="margin-right: 10px; color: var(--warning-color);"></i>Quick Recall Sheet</h3>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size: 0.95rem; color: var(--text-secondary); min-height: 100px; line-height: 1.6;">Generates a highly condensed, scannable memory-refresh document. Strictly contains key definitions, keywords, memory triggers, and core concepts with zero explanation. Ideal for a 2-minute review right before your exam.</p>', unsafe_allow_html=True)
-                if st.button("📝 Generate Quick Recall Sheet", key="landing_generate_rs", type="primary", use_container_width=True):
+                st.markdown('<h3 style="margin-top:0;"><i class="fa-solid fa-bolt" style="margin-right: 10px; color: var(--warning-color);"></i>Exam Recall Sheet</h3>', unsafe_allow_html=True)
+                st.markdown('<p style="font-size: 0.95rem; color: var(--text-secondary); min-height: 100px; line-height: 1.6;">A compressed revision sheet that helps you quickly remember everything you have studied before an exam.</p>', unsafe_allow_html=True)
+                if st.button("Generate Exam Recall Sheet", key="landing_generate_rs", type="primary", use_container_width=True):
                     from services.recall_sheet_generator import generate_recall_sheet
                     with st.spinner("Generating Recall Sheet..."):
                         st.session_state.recall_sheet = generate_recall_sheet(st.session_state.pdf_raw_text)
@@ -631,7 +639,7 @@ elif st.session_state.view_mode == "learning_plan":
     if st.session_state.active_section == "explanation":
         # ------------------ Explanation & Chat Page ------------------
         if not api_configured:
-            st.warning("Please set GEMINI_API_KEY in your .env file to generate lessons.")
+            st.warning("Please set API key to generate lessons.")
         else:
             cache_key = f"{topic_name}_{st.session_state.study_mode}"
             
@@ -670,7 +678,7 @@ elif st.session_state.view_mode == "learning_plan":
                     
             with sub_tab_2:
                 with st.container(border=True):
-                    st.markdown('<h3><i class="fa-solid fa-list-check" style="margin-right: 10px; color: var(--primary-color);"></i>Key Concepts & Mechanisms</h3>', unsafe_allow_html=True)
+                    st.markdown('<h3><i class="fa-solid fa-list-check" style="margin-right: 10px; color: var(--primary-color);"></i>Key Points</h3>', unsafe_allow_html=True)
                     st.markdown("<div style='margin-top: 1rem;'>", unsafe_allow_html=True)
                     for point in lesson.get("key_points", []):
                         st.markdown(f'<div class="list-item"><i class="fa-solid fa-circle-check" style="color: var(--primary-color); margin-top: 4px; margin-right: 10px;"></i><span>{point}</span></div>', unsafe_allow_html=True)
@@ -678,7 +686,7 @@ elif st.session_state.view_mode == "learning_plan":
                 
             with sub_tab_3:
                 with st.container(border=True):
-                    st.markdown('<h3><i class="fa-solid fa-bullseye" style="margin-right: 10px; color: var(--primary-color);"></i>Tutor Exam Advice & Focus Areas</h3>', unsafe_allow_html=True)
+                    st.markdown('<h3><i class="fa-solid fa-bullseye" style="margin-right: 10px; color: var(--primary-color);"></i>Exam Focus</h3>', unsafe_allow_html=True)
                     st.markdown("<div style='margin-top: 1rem;'>", unsafe_allow_html=True)
                     exam_focus_data = lesson.get("exam_focus", [])
                     if isinstance(exam_focus_data, list):
@@ -690,11 +698,11 @@ elif st.session_state.view_mode == "learning_plan":
                     
         # ChatGPT-Style Doubt chatbot (Directly integrated on the same page!)
         st.markdown("<hr style='border-top: 1px solid var(--border-color); margin: 2rem 0;'>", unsafe_allow_html=True)
-        st.markdown('<h3><i class="fa-solid fa-circle-question" style="margin-right: 10px; color: var(--primary-color);"></i>Ask Your Tutor</h3>', unsafe_allow_html=True)
-        st.caption("Ask questions about the explanation above. Answers are retrieved from your uploaded study notes.")
+        st.markdown('<h3><i class="fa-solid fa-circle-question" style="margin-right: 10px; color: var(--primary-color);"></i>Ask a Doubt</h3>', unsafe_allow_html=True)
+        
         
         if not api_configured:
-            st.warning("Please set GEMINI_API_KEY in your .env file to solve doubts.")
+            st.warning("Please set API key to solve doubts.")
         else:
             if topic_name not in st.session_state.doubt_history:
                 st.session_state.doubt_history[topic_name] = []
@@ -756,11 +764,11 @@ elif st.session_state.view_mode == "learning_plan":
                 
     elif st.session_state.active_section == "quiz":
         # ------------------ Quiz Page ------------------
-        st.markdown('<h3><i class="fa-solid fa-clipboard-check" style="margin-right: 10px; color: var(--primary-color);"></i>Concept Assessment</h3>', unsafe_allow_html=True)
+        st.markdown('<h3><i class="fa-solid fa-clipboard-check" style="margin-right: 10px; color: var(--primary-color);"></i>Practice Quiz</h3>', unsafe_allow_html=True)
         st.caption("Assess your understanding of the current topic with questions dynamically generated from your notes.")
         
         if not api_configured:
-            st.warning("Please set GEMINI_API_KEY in your .env file to generate quizzes.")
+            st.warning("Please set API key to generate quizzes.")
         else:
             if not quiz["questions"]:
                 with st.container(border=True):
@@ -825,7 +833,7 @@ elif st.session_state.view_mode == "learning_plan":
         # ------------------ Evaluation / Analysis Page ------------------
         eval_data = quiz["evaluation"]
         
-        st.markdown('<h3><i class="fa-solid fa-chart-pie" style="margin-right: 10px; color: var(--primary-color);"></i>Diagnostic Results</h3>', unsafe_allow_html=True)
+        st.markdown('<h3><i class="fa-solid fa-chart-pie" style="margin-right: 10px; color: var(--primary-color);"></i>Quiz Results</h3>', unsafe_allow_html=True)
         st.caption("Review your score, strong concepts, and areas requiring further study.")
         
         col_score, col_percent = st.columns(2)
@@ -835,7 +843,7 @@ elif st.session_state.view_mode == "learning_plan":
             st.metric("Percentage", f"{st.session_state.quiz['percentage']}%")
             
         st.markdown("---")
-        st.markdown('<h4><i class="fa-solid fa-microscope" style="margin-right: 8px; color: var(--primary-color);"></i>Conceptual Diagnostics</h4>', unsafe_allow_html=True)
+        st.markdown('<h4><i class="fa-solid fa-microscope" style="margin-right: 8px; color: var(--primary-color);"></i>Performance Summary</h4>', unsafe_allow_html=True)
         
         col_strong, col_weak = st.columns(2)
         with col_strong:

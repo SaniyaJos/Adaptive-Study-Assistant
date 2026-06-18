@@ -9,7 +9,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = "gemini-flash-lite-latest"
 
 # Embedding & Vector Database Configurations
-EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL_NAME = "models/gemini-embedding-001"
 CHROMA_PERSIST_DIR = os.path.join(os.path.dirname(__file__), "chroma_db")
 CHROMA_COLLECTION_NAME = "studyflow_notes"
 

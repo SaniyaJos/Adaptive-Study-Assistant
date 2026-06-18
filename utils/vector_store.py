@@ -1,36 +1,47 @@
 import os
 import chromadb
 from chromadb.api.types import Documents, Embeddings
-from sentence_transformers import SentenceTransformer
 from typing import List
 import config
+from services.gemini_service import configure_gemini
 
 _query_cache = {}
 
-class LocalEmbeddingFunction(chromadb.EmbeddingFunction):
+class GoogleEmbeddingFunction(chromadb.EmbeddingFunction):
     """
-    Custom ChromaDB EmbeddingFunction to generate embeddings locally using Sentence Transformers.
+    Custom ChromaDB EmbeddingFunction to generate embeddings using Google's Gemini API.
     """
     def __init__(self, model_name: str = config.EMBEDDING_MODEL_NAME):
-        # Load the SentenceTransformer model (cached in memory)
-        self.model = SentenceTransformer(model_name)
+        self.model_name = model_name
 
     def __call__(self, input: Documents) -> Embeddings:
-        # Convert documents to local embeddings and return them as a list of lists (floats)
-        embeddings = self.model.encode(input).tolist()
-        return embeddings
+        import google.generativeai as genai
+        # Ensure Gemini is configured
+        configure_gemini()
+        try:
+            # Generate embeddings using Google's text-embedding-004 model
+            result = genai.embed_content(
+                model=self.model_name,
+                content=input,
+                task_type="retrieval_document"
+            )
+            embeddings = result.get("embedding", [])
+            if len(input) > 0 and len(embeddings) > 0 and not isinstance(embeddings[0], list):
+                embeddings = [embeddings]
+            return embeddings
+        except Exception as e:
+            raise RuntimeError(f"Failed to generate Google embeddings: {e}")
 
 # Global variable to cache the embedding function singleton
 _embedding_fn = None
 
-def get_embedding_function() -> LocalEmbeddingFunction:
+def get_embedding_function() -> GoogleEmbeddingFunction:
     """
-    Lazy-loads and returns the singleton LocalEmbeddingFunction instance to avoid
-    re-instantiating the SentenceTransformer model.
+    Lazy-loads and returns the singleton GoogleEmbeddingFunction instance.
     """
     global _embedding_fn
     if _embedding_fn is None:
-        _embedding_fn = LocalEmbeddingFunction()
+        _embedding_fn = GoogleEmbeddingFunction()
     return _embedding_fn
 
 def get_chroma_collection():
@@ -56,13 +67,16 @@ def index_pdf_chunks(chunks: List[str]):
     Args:
         chunks: List of string chunks to store in ChromaDB.
     """
+    # Initialize persistent client to delete the collection if it already exists
+    # to avoid dimension conflicts (e.g. switching from local 384 dimensions to cloud 3072 dimensions)
+    client = chromadb.PersistentClient(path=config.CHROMA_PERSIST_DIR)
+    try:
+        client.delete_collection(name=config.CHROMA_COLLECTION_NAME)
+    except Exception:
+        pass
+        
     collection = get_chroma_collection()
     
-    # 1. Clear any existing documents in the collection
-    existing_docs = collection.get()
-    if existing_docs and existing_docs["ids"]:
-        collection.delete(ids=existing_docs["ids"])
-        
     # 2. Add new chunks to the collection
     if not chunks:
         return
