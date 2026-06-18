@@ -549,7 +549,7 @@ elif st.session_state.view_mode == "recall_sheet":
     col_rs_left, col_rs_mid, col_rs_right = st.columns([1, 4, 1])
     with col_rs_mid:
         with st.container(border=True):
-            st.markdown('<h2 style="text-align: center; color: var(--primary-color); margin-top:0;"><i class="fa-solid fa-bolt" style="margin-right: 10px; color: var(--warning-color);"></i>Quick Recall Sheet</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 style="text-align: center; color: var(--primary-color); margin-top:0;"><i class="fa-solid fa-bolt" style="margin-right: 10px; color: var(--warning-color);"></i>Exam Recall Sheet</h2>', unsafe_allow_html=True)
             st.markdown('<p style="text-align: center; color: var(--text-secondary); font-style: italic; font-size: 0.95rem; margin-bottom: 1.5rem;">Last-minute memory triggers. Read 10-15 minutes before the exam.</p>', unsafe_allow_html=True)
             st.markdown("<hr style='border-top: 1px solid var(--border-color); margin: 1.5rem 0;'>", unsafe_allow_html=True)
             

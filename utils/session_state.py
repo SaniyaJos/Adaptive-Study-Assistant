@@ -82,7 +82,7 @@ def init_session_state():
         st.session_state["initialized"] = True
         if load_session_state():
             return
-    # 1. Document Loading & Processing State
+
     if "pdf_raw_text" not in st.session_state:
         st.session_state.pdf_raw_text = None
     if "processed_chunks" not in st.session_state:
@@ -90,7 +90,6 @@ def init_session_state():
     if "pdf_metadata" not in st.session_state:
         st.session_state.pdf_metadata = {}  # E.g., page_count, char_count, file_name
     
-    # 2. Study Goal & Learning Path Navigation
     if "study_mode" not in st.session_state:
         st.session_state.study_mode = "Learn Concepts"  # "Learn Concepts" | "Exam Preparation" | "Quick Revision"
     if "topics" not in st.session_state:
@@ -98,34 +97,32 @@ def init_session_state():
     if "current_topic_index" not in st.session_state:
         st.session_state.current_topic_index = 0
     if "completed_topics" not in st.session_state:
-        st.session_state.completed_topics = []  # List of topic names that have been completed (quiz passed)
+        st.session_state.completed_topics = []  # List of topic names completed (quiz passed)
     if "active_section" not in st.session_state:
         st.session_state.active_section = "explanation"  # "explanation" | "quiz" | "analysis"
         
-    # 3. Topic Explanations Cache (to avoid re-querying Gemini for the same topic/mode)
     if "explanations" not in st.session_state:
         st.session_state.explanations = {}  # Maps "topic_name_study_mode" -> dict of parsed sections
         
-    # 4. Doubt Solving Chat History
     if "doubt_history" not in st.session_state:
         st.session_state.doubt_history = {}  # Maps topic name -> list of dicts: {"role": "user"|"assistant", "content": str}
         
-    # 5. Dynamic Quiz State
     if "quiz" not in st.session_state:
         st.session_state.quiz = {
             "questions": [],            # List of quiz question dicts
-            "current_question_idx": 0,  # Active question index
+            "current_question_idx": 0,
             "selected_answers": {},     # Maps question index -> selected option (str)
-            "score": None,              # Final score (int)
-            "percentage": None,         # Final percentage (float)
+            "score": None,
+            "percentage": None,
             "evaluation": None,         # Evaluation dict (strong areas, weak areas, revision tips)
-            "completed": False,         # Whether quiz has been submitted
+            "completed": False,
             "size": 5                   # Quiz length (3, 5, or 10)
         }
     if "view_mode" not in st.session_state:
         st.session_state.view_mode = "landing"
     if "recall_sheet" not in st.session_state:
         st.session_state.recall_sheet = None
+
 
 
 def reset_document_state():

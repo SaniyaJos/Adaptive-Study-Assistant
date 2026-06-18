@@ -5,23 +5,13 @@ def solve_doubt(query: str, topic_name: str, chat_history: List[Dict[str, str]])
     """
     Answers a student's doubt about a specific topic using RAG from ChromaDB
     and preserving the chat history context.
-    
-    Args:
-        query: The student's question/doubt.
-        topic_name: The current active topic/concept.
-        chat_history: List of prior messages: [{"role": "user"|"assistant", "content": str}]
-        
-    Returns:
-        str: The AI tutor's response in markdown.
     """
     from utils.vector_store import query_relevant_chunks
 
-    # 1. Retrieve notes context from ChromaDB using a combination of the topic and the query
     search_query = f"{topic_name}: {query}"
     relevant_chunks = query_relevant_chunks(query=search_query, top_k=5)
     context_text = "\n\n".join(relevant_chunks) if relevant_chunks else "No source notes available."
     
-    # 2. Format the chat history for conversational continuity
     history_context = ""
     if chat_history:
         history_context = "Here is the conversation history on this topic so far:\n"
@@ -30,7 +20,6 @@ def solve_doubt(query: str, topic_name: str, chat_history: List[Dict[str, str]])
             history_context += f"- {role_name}: {msg['content']}\n"
         history_context += "\n"
         
-    # 3. Setup prompt instructions
     system_instruction = (
         "You are StudyFlow AI, an expert, patient, and engaging academic tutor. "
         "Your task is to answer the student's doubt about the active topic. "
@@ -67,3 +56,4 @@ def solve_doubt(query: str, topic_name: str, chat_history: List[Dict[str, str]])
         
     except Exception as e:
         return f"Sorry, I encountered an error answering your question: {e}. Please check your API key or try again."
+

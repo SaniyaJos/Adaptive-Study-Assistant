@@ -7,17 +7,11 @@ def configure_gemini(api_key: Optional[str] = None) -> bool:
     """
     Configures the google-generativeai SDK with the provided API key 
     or falls back to the key specified in config.py.
-    
-    Args:
-        api_key: Optional string containing Gemini API key.
-        
-    Returns:
-        bool: True if key is successfully configured, False otherwise.
     """
     from dotenv import load_dotenv
     import importlib
     
-    # Reload environment variables from .env to pick up updates on Streamlit rerun
+    # Reload environment variables to pick up updates dynamically on Streamlit rerun
     load_dotenv(override=True)
     importlib.reload(config)
     
@@ -37,16 +31,7 @@ def _cached_generate_response(
 ) -> str:
     """
     Helper function to prompt the gemini-1.5-flash model.
-    
-    Args:
-        prompt: User prompt content.
-        system_instruction: System persona or behavioral instruction.
-        json_mode: If True, forces model to respond in valid JSON format.
-        
-    Returns:
-        str: Response text from the model.
     """
-    # Verify API config (in case configuration hasn't run yet)
     configure_gemini()
     
     generation_config = {
@@ -56,7 +41,6 @@ def _cached_generate_response(
         "max_output_tokens": 8192,
     }
     
-    # Enable JSON mode structure
     if json_mode:
         generation_config["response_mime_type"] = "application/json"
         
@@ -70,7 +54,6 @@ def _cached_generate_response(
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        # Return empty string or handle gracefully
         raise RuntimeError(f"Error communicating with Gemini API: {str(e)}")
 
 
@@ -89,3 +72,4 @@ def generate_response(
         json_mode=json_mode,
         model_name=config.GEMINI_MODEL,
     )
+

@@ -7,14 +7,6 @@ def extract_topics(raw_text: str, study_mode: str) -> List[Dict[str, str]]:
     """
     Analyzes raw PDF text and extracts a logical sequence of granular topics
     with priority rankings based on the selected study mode.
-    
-    Args:
-        raw_text: Full text content of the PDF notes.
-        study_mode: The chosen study goal ("Learn Concepts", "Exam Preparation", "Quick Revision").
-        
-    Returns:
-        List[Dict[str, str]]: A list of topics, e.g.:
-                              [{"name": "Paging", "priority": "High Priority"}]
     """
     if not raw_text or not raw_text.strip():
         return []
@@ -33,7 +25,6 @@ def extract_topics(raw_text: str, study_mode: str) -> List[Dict[str, str]]:
         "- Do not include any conversational filler, markdown formatting (like ```json), or explanation outside the JSON array."
     )
     
-    # Customize instructions depending on the study goal
     if study_mode == "Exam Preparation":
         mode_instruction = (
             "Focus: Identify ALL topics in the notes, but determine their exam priority levels based on "
@@ -55,7 +46,8 @@ def extract_topics(raw_text: str, study_mode: str) -> List[Dict[str, str]]:
         f"{mode_instruction}\n\n"
         f"Here are the study notes to analyze:\n"
         f"--- START OF STUDY NOTES ---\n"
-        f"{raw_text[:100000]}...\n"  # Clip raw text at 100k characters for safe token limit
+        # Protect model window constraints (clip to 100k chars)
+        f"{raw_text[:100000]}...\n"
         f"--- END OF STUDY NOTES ---\n\n"
         f"Generate the JSON array of topics now:"
     )
@@ -67,23 +59,18 @@ def extract_topics(raw_text: str, study_mode: str) -> List[Dict[str, str]]:
             json_mode=True
         )
         
-        # Clean up responses that might be wrapped in markdown code blocks
         clean_json = response_text.strip()
         if clean_json.startswith("```"):
-            # Remove leading markdown wrapper e.g. ```json or ```
             clean_json = re.sub(r"^```[a-zA-Z]*\n", "", clean_json)
-            # Remove trailing markdown wrapper
             clean_json = re.sub(r"\n```$", "", clean_json)
             clean_json = clean_json.strip()
             
         topics = json.loads(clean_json)
         
-        # Validate return structure
         if isinstance(topics, list):
             validated_topics = []
             for t in topics:
                 if isinstance(t, dict) and "name" in t:
-                    # Clean/normalize priority values
                     p = t.get("priority", "Medium Priority")
                     if p not in ["High Priority", "Medium Priority", "Lower Priority"]:
                         p = "Medium Priority"
@@ -91,13 +78,12 @@ def extract_topics(raw_text: str, study_mode: str) -> List[Dict[str, str]]:
             return validated_topics
             
     except Exception as e:
-        # Fallback parsing in case Gemini outputs invalid JSON structure
         print(f"JSON topic extraction error: {e}. Attempting regex fallback.")
         
-    # Standard fallback if LLM response couldn't be parsed as structured JSON
     return [
         {"name": "Introduction & Overview", "priority": "High Priority"},
         {"name": "Core Concepts", "priority": "High Priority"},
         {"name": "Detailed Applications", "priority": "Medium Priority"},
         {"name": "Summary & Revision", "priority": "Lower Priority"}
     ]
+

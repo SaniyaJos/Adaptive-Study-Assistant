@@ -16,10 +16,8 @@ class GoogleEmbeddingFunction(chromadb.EmbeddingFunction):
 
     def __call__(self, input: Documents) -> Embeddings:
         import google.generativeai as genai
-        # Ensure Gemini is configured
         configure_gemini()
         try:
-            # Generate embeddings using Google's text-embedding-004 model
             result = genai.embed_content(
                 model=self.model_name,
                 content=input,
@@ -32,7 +30,6 @@ class GoogleEmbeddingFunction(chromadb.EmbeddingFunction):
         except Exception as e:
             raise RuntimeError(f"Failed to generate Google embeddings: {e}")
 
-# Global variable to cache the embedding function singleton
 _embedding_fn = None
 
 def get_embedding_function() -> GoogleEmbeddingFunction:
@@ -48,7 +45,6 @@ def get_chroma_collection():
     """
     Initializes a persistent ChromaDB client and returns the collection.
     """
-    # Ensure Chroma persistence directory exists
     os.makedirs(config.CHROMA_PERSIST_DIR, exist_ok=True)
     
     client = chromadb.PersistentClient(path=config.CHROMA_PERSIST_DIR)
@@ -63,12 +59,9 @@ def get_chroma_collection():
 def index_pdf_chunks(chunks: List[str]):
     """
     Clears the current collection and indexes a new list of text chunks.
-    
-    Args:
-        chunks: List of string chunks to store in ChromaDB.
     """
-    # Initialize persistent client to delete the collection if it already exists
-    # to avoid dimension conflicts (e.g. switching from local 384 dimensions to cloud 3072 dimensions)
+    # Delete the collection if it already exists to avoid dimension conflicts 
+    # (e.g. switching from local 384 dimensions to cloud 3072 dimensions)
     client = chromadb.PersistentClient(path=config.CHROMA_PERSIST_DIR)
     try:
         client.delete_collection(name=config.CHROMA_COLLECTION_NAME)
@@ -77,7 +70,6 @@ def index_pdf_chunks(chunks: List[str]):
         
     collection = get_chroma_collection()
     
-    # 2. Add new chunks to the collection
     if not chunks:
         return
         
@@ -99,13 +91,6 @@ def clear_query_cache():
 def query_relevant_chunks(query: str, top_k: int = 4) -> List[str]:
     """
     Queries ChromaDB for the most relevant text chunks matching the query.
-    
-    Args:
-        query: The search query text (e.g. user doubt).
-        top_k: Number of relevant chunks to retrieve.
-        
-    Returns:
-        List[str]: The text content of the matching chunks, ordered by similarity.
     """
     if not query.strip():
         return []
@@ -121,10 +106,10 @@ def query_relevant_chunks(query: str, top_k: int = 4) -> List[str]:
         n_results=top_k
     )
     
-    # Extract list of matched text documents
     if results and "documents" in results and results["documents"]:
         _query_cache[cache_key] = results["documents"][0]
         return _query_cache[cache_key]
         
     _query_cache[cache_key] = []
     return []
+

@@ -7,26 +7,12 @@ def generate_topic_lesson(topic_name: str, study_mode: str, other_topics: Option
     """
     Retrieves relevant note chunks for the specified topic and generates a
     highly structured lesson lesson tailored to the selected study mode.
-    
-    Args:
-        topic_name: Name of the topic/concept.
-        study_mode: The active study mode ("Learn Concepts", "Exam Preparation", "Quick Revision").
-        other_topics: Optional list of other topics in the curriculum to avoid repetition.
-        
-    Returns:
-        Dict: A structured lesson dictionary containing:
-              - "explanation": str
-              - "key_points": List[str]
-              - "exam_focus": List[str]
-              - "quick_recall": str
     """
     from utils.vector_store import query_relevant_chunks
 
-    # 1. Retrieve the most relevant source note context from ChromaDB
     relevant_chunks = query_relevant_chunks(query=topic_name, top_k=6)
     context_text = "\n\n".join(relevant_chunks) if relevant_chunks else "No source notes available."
     
-    # Construct details about other topics to avoid repetition
     avoid_instruction = ""
     if other_topics:
         valid_others = [t for t in other_topics if t and t.strip()]
@@ -40,7 +26,6 @@ def generate_topic_lesson(topic_name: str, study_mode: str, other_topics: Option
                 f"Focus ONLY and EXCLUSIVELY on the concepts, subtopics, attributes, and mechanisms that are unique to the current topic '{topic_name}'."
             )
     
-    # Customize system instruction and prompts dynamically based on study_mode
     if study_mode == "Learn Concepts":
         system_instruction = f"""You are StudyFlow AI, an excellent, friendly academic tutor.
 Your goal is to thoroughly explain the topic to a student encountering it for the first time, ensuring they build a deep, intuitive understanding.
@@ -173,7 +158,6 @@ Requirements:
             json_mode=True
         )
         
-        # Clean markdown formatting wraps if any
         clean_json = response_text.strip()
         if clean_json.startswith("```"):
             clean_json = re.sub(r"^```[a-zA-Z]*\n", "", clean_json)
@@ -182,7 +166,6 @@ Requirements:
             
         lesson_data = json.loads(clean_json)
         
-        # Ensure all keys exist
         default_keys = {
             "explanation": "",
             "key_points": [],
@@ -198,7 +181,7 @@ Requirements:
     except Exception as e:
         print(f"Error generating or parsing lesson JSON: {e}")
         
-    # Robust fallback dictionary in case of API or JSON failures
+    # Default fallback content
     return {
         "explanation": f"Welcome to the lesson on **{topic_name}**. We retrieved your notes, but could not connect to the explanation engine.",
         "key_points": [
@@ -211,3 +194,4 @@ Requirements:
         "quick_recall": f"Quick review of {topic_name}: Please configure API access.",
         "is_fallback": True
     }
+
