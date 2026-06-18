@@ -32,7 +32,9 @@ def save_session_state():
         "active_section",
         "explanations",
         "doubt_history",
-        "quiz"
+        "quiz",
+        "view_mode",
+        "recall_sheet"
     ]
     data = {}
     for key in state_keys:
@@ -120,6 +122,10 @@ def init_session_state():
             "completed": False,         # Whether quiz has been submitted
             "size": 5                   # Quiz length (3, 5, or 10)
         }
+    if "view_mode" not in st.session_state:
+        st.session_state.view_mode = "landing"
+    if "recall_sheet" not in st.session_state:
+        st.session_state.recall_sheet = None
 
 
 def reset_document_state():
@@ -135,6 +141,8 @@ def reset_document_state():
     st.session_state.active_section = "explanation"
     st.session_state.explanations = {}
     st.session_state.doubt_history = {}
+    st.session_state.view_mode = "landing"
+    st.session_state.recall_sheet = None
     reset_quiz_state()
     clear_saved_session_state()
 
