@@ -4,7 +4,7 @@ StudyFlow AI is an interactive, AI-powered study assistant built on the Google G
 
 ---
 
-## 🗺️ Architecture & Data Flow
+## Architecture & Data Flow
 
 Below is the conceptual architecture showing how uploaded study materials are processed, indexed, and transformed into interactive study sessions:
 
@@ -55,7 +55,7 @@ graph TD
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 * **Frontend Dashboard**: [Streamlit](https://streamlit.io/) (with a customized, premium CSS theme and Font Awesome icons)
 * **LLM Engine**: Google Gemini API (`gemini-flash-lite-latest`)
@@ -66,7 +66,7 @@ graph TD
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 ├── app.py                      # Main Streamlit dashboard, navigation router, and custom styling
@@ -87,7 +87,7 @@ graph TD
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 ```bash
@@ -135,7 +135,7 @@ After initialization, open the local URL in your web browser (usually `http://lo
 
 ---
 
-## 📝 Usage Walkthrough
+## Usage Walkthrough
 
 1. **Upload Notes**: Drop your lecture PDF in the sidebar. The system will automatically parse the document and index it in the local vector database.
 2. **Choose Your Study Mode**: Select between *Learn Concepts*, *Exam Preparation*, or *Quick Revision* based on your current study objectives.
