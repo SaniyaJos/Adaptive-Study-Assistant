@@ -1,6 +1,6 @@
 # StudyFlow AI — Adaptive Study Assistant & Smart Tutor
 
-StudyFlow AI is an interactive, AI-powered study assistant built on the Google Gemini ecosystem. It transforms passive reading of lecture notes (PDF format) into an active, structured learning experience. By automatically extracting curriculum topics, hosting a contextual doubt-solving chat, generating custom-tailored lessons, administering dynamic assessments, and preparing last-minute memory recall sheets, StudyFlow AI acts as a personal tutor tailored to your learning goals.
+StudyFlow AI is an interactive, AI-powered study assistant built on the Google Gemini ecosystem. It transforms static lecture notes into an adaptive learning experience with personalized study paths, contextual doubt solving, dynamic assessments, and exam-day recall sheets. StudyFlow AI acts as a personal tutor tailored to your learning goals.
 
 ---
 
@@ -29,9 +29,9 @@ graph TD
     E -.->|Similarity Search Context| M
     
     L --> N[Dynamic Practice Quizzes]
-    N --> O[Diagnostic Feedback Report]
+    N --> O[Performance Insights]
     
-    B --> P[Exam Recall Sheet <br> 2-Minute Last-Minute Review]
+    B --> P[Exam Recall Sheet <br> Memory Refresh Before Exams]
 ```
 
 ---
@@ -49,7 +49,7 @@ graph TD
    * *Exam Focus*: High-priority elements targeting test preparation.
 4. **Context-Aware Doubt Solver (RAG)**: An interactive chatbot embedded directly below your lesson. It queries your indexed notes via vector search to answer specific questions, provide alternative analogies, or elaborate on complex paragraphs.
 5. **Dynamic Assessments**: Generate custom-length quizzes (3, 5, or 10 questions) tailored directly to the active topic.
-6. **Detailed Diagnostic Reports**: Evaluates quiz answers to return an objective score and a diagnostic report highlighting strong concepts, topics needing review, and action-oriented study tips.
+6. **Detailed Performance Insights**: Evaluates quiz answers to return an objective score and a Performance Insights highlighting strong concepts, topics needing review, and action-oriented study tips.
 7. **Exam Recall Sheet**: Generates a highly compressed, scannable revision sheet containing key keywords, relationship mappings, and short memory triggers designed to be reviewed 10–15 minutes before an exam.
 8. **Seamless Session Persistence**: Tracks and saves your entire progress (completed topics, chat histories, active sections, and active view modes) to a unique session file, keeping your state intact through browser refreshes.
 
@@ -77,7 +77,7 @@ graph TD
 │   ├── topic_extractor.py      # Extracts the curriculum structure from parsed notes
 │   ├── tutor_engine.py         # Generates custom-styled lessons based on active study modes
 │   ├── doubt_solver.py         # Contextual RAG doubt resolver querying ChromaDB
-│   ├── quiz_generator.py       # Generates practice questions and builds diagnostic reports
+│   ├── quiz_generator.py       # Generates practice questions and builds Performance Insights
 │   └── recall_sheet_generator.py # Generates last-minute memory-recall sheets
 └── utils/
     ├── pdf_processor.py        # PDF text extractor and recursive chunking utility
@@ -142,4 +142,13 @@ After initialization, open the local URL in your web browser (usually `http://lo
 3. **Select Study View**:
    * **Learn**: Generates the sequential learning path. Read through explanations, ask doubts to the chatbot, and test your knowledge.
    * **Exam Recall**: Generates a quick memory-refresh guide compiled from your entire document.
-4. **Take Quizzes**: Generate a quiz on any topic, submit your answers, and check the diagnostics section to view your strengths and review recommendations.
+4. **Take Quizzes**: Generate a quiz on any topic, submit your answers, and check the Performance Insights section to view your strengths and review recommendations.
+
+## Skills Demonstrated
+
+- Retrieval-Augmented Generation (RAG)
+- Vector Databases (ChromaDB)
+- Google Gemini API Integration
+- Semantic Search
+- Streamlit Application Development
+- Session Persistence & State Management
