@@ -305,6 +305,45 @@ st.markdown(f"""
         float: right !important;
         width: auto !important;
     }}
+    
+    /* Flexbox Card Grid for Landing Page */
+    .landing-cards-row {{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 1.5rem !important;
+        margin-top: 1rem !important;
+        width: 100% !important;
+    }}
+    .landing-card-col {{
+        flex: 1 1 calc(25% - 1.125rem) !important;
+        min-width: 220px !important;
+        display: flex !important;
+    }}
+    .landing-card-inner {{
+        background-color: var(--card-bg) !important;
+        border-radius: 12px !important;
+        box-shadow: var(--card-shadow) !important;
+        padding: 1.5rem !important;
+        border: 1px solid var(--border-color) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+    }}
+    .landing-card-title {{
+        margin-top: 0 !important;
+        margin-bottom: 0.75rem !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+        line-height: 1.3 !important;
+    }}
+    .landing-card-text {{
+        font-size: 0.92rem !important;
+        line-height: 1.5 !important;
+        color: var(--text-secondary) !important;
+        margin: 0 !important;
+        flex-grow: 1 !important;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -473,29 +512,44 @@ if st.session_state.view_mode == "landing":
     if not st.session_state.pdf_metadata:
         # Standard Welcome Landing Page (No PDF uploaded yet)
         st.markdown('<h1 class="main-header"><i class="fa-solid fa-graduation-cap" style="color: var(--primary-color); margin-right: 12px;"></i>StudyFlow AI</h1>', unsafe_allow_html=True)
-        st.markdown('<p class="sub-header">A guided study platform that extracts a tailored curriculum from your notes, provides explanations, and diagnostics of your understanding.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Turn your notes into a personalized learning experience. Understand concepts, clear doubts, test yourself, and revise smarter.</p>', unsafe_allow_html=True)
         
         # Friendly instructional alert
         st.markdown("""
         <div class="info-box" style="margin-bottom: 2rem;">
             <span style="font-weight: bold; color: var(--primary-color);"><i class="fa-solid fa-circle-info" style="margin-right: 8px;"></i>Getting Started</span>
-            <p style="margin: 0.25rem 0 0 0;">Please upload your study notes PDF in the sidebar to begin. StudyFlow AI will analyze your notes and prepare your interactive study session.</p>
+            <p style="margin: 0.25rem 0 0 0;">Upload your study notes to get started. StudyFlow AI will organize your material into topics, generate personalized explanations, create practice quizzes, and help you revise more effectively.</p>
         </div>
         """, unsafe_allow_html=True)
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            with st.container(border=True):
-                st.markdown('<h4><i class="fa-solid fa-route" style="margin-right: 8px; color: var(--primary-color);"></i>Structured Path</h4>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size: 0.92rem; line-height: 1.5; color: var(--text-secondary);">Your notes are parsed into key sequential topics, creating an organized learning path that tracks your mastery as you study.</p>', unsafe_allow_html=True)
-        with col2:
-            with st.container(border=True):
-                st.markdown('<h4><i class="fa-solid fa-sliders" style="margin-right: 8px; color: var(--primary-color);"></i>Study Goals</h4>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size: 0.92rem; line-height: 1.5; color: var(--text-secondary);">Select study modes tailored to your objective: Learn Concepts for a beginner curve, Exam Prep for test focus, or Quick Revision.</p>', unsafe_allow_html=True)
-        with col3:
-            with st.container(border=True):
-                st.markdown('<h4><i class="fa-solid fa-clipboard-question" style="margin-right: 8px; color: var(--primary-color);"></i>Smart Quizzes</h4>', unsafe_allow_html=True)
-                st.markdown('<p style="font-size: 0.92rem; line-height: 1.5; color: var(--text-secondary);">Assess your knowledge with questions mapped to notes, and identify specific topics needing revision with detailed diagnostics.</p>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="landing-cards-row">
+            <div class="landing-card-col">
+                <div class="landing-card-inner">
+                    <h4 class="landing-card-title"><i class="fa-solid fa-route" style="margin-right: 8px; color: var(--primary-color);"></i>Learning Path</h4>
+                    <p class="landing-card-text">Your notes are automatically organized into clear topics, making it easier to learn step by step without feeling overwhelmed.</p>
+                </div>
+            </div>
+            <div class="landing-card-col">
+                <div class="landing-card-inner">
+                    <h4 class="landing-card-title"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: var(--primary-color);"></i>Study Goals</h4>
+                    <p class="landing-card-text">Choose how you want to study. Learn concepts in depth, focus on exam preparation, or quickly revise important ideas before a test.</p>
+                </div>
+            </div>
+            <div class="landing-card-col">
+                <div class="landing-card-inner">
+                    <h4 class="landing-card-title"><i class="fa-solid fa-clipboard-question" style="margin-right: 8px; color: var(--primary-color);"></i>Smart Quizzes</h4>
+                    <p class="landing-card-text">Practice with quizzes generated directly from your notes and discover which topics need more attention.</p>
+                </div>
+            </div>
+            <div class="landing-card-col">
+                <div class="landing-card-inner">
+                    <h4 class="landing-card-title"><i class="fa-solid fa-bolt" style="margin-right: 8px; color: var(--warning-color);"></i>Exam Recall</h4>
+                    <p class="landing-card-text">Generate a quick memory-refresh sheet that helps you recall important concepts across your notes before an exam.</p>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     else:
         # PDF is uploaded, but no plan or recall sheet is generated yet (Landing with PDF metadata)
         st.markdown('<h1 class="main-header"><i class="fa-solid fa-graduation-cap" style="color: var(--primary-color); margin-right: 12px;"></i>StudyFlow AI</h1>', unsafe_allow_html=True)
